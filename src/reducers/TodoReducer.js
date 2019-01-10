@@ -1,11 +1,27 @@
 const initState = {
     items: [
-        'Eat',
-        'Sleep',
-        'Feed cat',
-        'Play in games on computer'
+        {
+            name: 'Eat',
+            completed: false,
+            editing: false
+        },
+        {
+            name: 'Sleep',
+            completed: false,
+            editing: false
+        },
+        {
+            name: 'Feed cat',
+            completed: false,
+            editing: false
+        },
+        {
+            name: 'Play in games on computer',
+            completed: false,
+            editing: false
+        }
     ],
-    completed: false,
+    
 }
 
 const TodoReducer = (state = initState, action) => {
@@ -17,6 +33,10 @@ const TodoReducer = (state = initState, action) => {
            return DELETE_ITEM(state, action);
         case "TOGGLE_ITEM":
             return TOGGLE_ITEM(state, action);
+        case "EDIT_ITEM":
+            return EDIT_ITEM(state, action);  
+        case "UPDATE_ITEM":
+            return UPDATE_ITEM(state, action); 
         default:
             return state;
     }
@@ -26,8 +46,10 @@ const TodoReducer = (state = initState, action) => {
 /* Добавляем новую задачу */
 
 function ADD_ITEM(state, action) {
+
+    let name = action.payload.value;
  
-  return { ...state, items: [...state.items, action.payload.value], completed: false, };  
+    return { ...state, items: [...state.items, { name, completed: false }] };  
 
 }
 
@@ -43,10 +65,45 @@ function DELETE_ITEM(state, action) {
 
 function TOGGLE_ITEM(state, action) {
 
-    return { ...state, completed: [...state.items.map((item, i) => {
-        return i === action.payload.id ? true : '';
-    }) ]};  
+    let items = state.items.map((item, i) => {
+        if(i !== action.payload.id) {
+            return item;
+        }
 
+        return {...item, completed: !item.completed};
+    });
+
+    return { ...state, items};
+}
+
+/* Редактировать задачу */
+
+function EDIT_ITEM(state, action) {
+
+    let items = state.items.map((item, i) => {
+        if(i !== action.payload.id) {
+            return item;
+        }
+
+        return {...item, editing: !item.editing};
+    });
+
+    return { ...state, items};  
+}
+
+function UPDATE_ITEM(state, action) {
+    
+    let items = state.items.map((item, i) => {
+        
+        if(i === action.payload.id) {
+            return {...item, name: action.payload.name};
+        }
+
+        return item;
+    });
+    
+    return { ...state, items}; 
+ 
 }
 
 
