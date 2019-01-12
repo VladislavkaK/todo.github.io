@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { getVisibleTodos } from '../reducers/TodoReducer';
+import style from '../styles/App.css';
 
 /* Компонент для списка задач */
 
@@ -32,45 +34,87 @@ class Items extends React.Component {
     };
     
     render() {
-    
+
+        let { todos, filter } = this.props;
+
+        let todosItems = todos.map((item, i) => {
+            let {name, completed} = item;
+
+            return (
+                <ul class="list-group" style={{paddingTop:20}}>
+                    <li className="list-group-item" key={i} style={{
+                        textDecoration: completed === true ? 'line-through' : 'none',
+                    }}>
+                        <div className="text">{name}</div>
+                    </li>
+                </ul>
+            );
+        });
+        
         let listItems = this.props.items.map((item, i) => {
 
             let {name, completed, editing} = item;
     
             if (editing === true) {
                 return (
-                    <React.Fragment key={i}>
-                        <input type="text" value={name} onChange={(e) => this.handleEdit(e, i)} />
+                    <React.Fragment key={i} >
+                        <input type="text" className="form-control mr-sm-2" value={name}  onChange={(e) => this.handleEdit(e, i)} />
 
                         <button
-                            onClick={() => this.editItem(i)}>
-                            Изменить значение
+                            className="btn btn-primary"
+                            onClick={() => this.editItem(i)}
+                            >
+                            Обновить значение
                         </button>
                     </React.Fragment>
                 )
             }
 
             return (
-            <li key={i} style={{
-                textDecoration: completed === true ? 'line-through' : 'none'
-            }}>
-                <div className="text">{name}</div>
-                <button
-                    onClick={() => this.deleteItem(i)}>
-                    Удалить задачу
-                </button>
-                <button
-                    onClick={() => this.toggleItem(i)}>
-                    Задача выполнена
-                </button>
-                <button
-                    onClick={() => this.editItem(i)}>
-                    Редактировать задачу
-                </button>
-            </li>
+                <React.Fragment key={i} className="menu">
+
+                <ul className="list-group" style={{paddingTop:20}}>
+                    <li className="list-group-item new-list-2" >
+               
+                    <div className="frame" style={{width:"50px"}}> 
+                        <input type="checkbox" checked={completed === true ? true : false}
+                            onChange={() => this.toggleItem(i)} />
+                    </div>
+                    <div className="text frame" style={{
+                        textDecoration: completed === true ? 'line-through' : 'none',  
+                        }}>{name}
+                    </div>
+                    </li>
+                    
+                    <button
+                        className="btn btn-danger"
+                        onClick={() => this.deleteItem(i)}>
+                        Удалить задачу
+                    </button>
+                    <button
+                        className="btn btn-success"
+                        onClick={() => this.toggleItem(i)}>
+                        Задача выполнена
+                    </button>
+                    <button
+                        className="btn btn-dark"
+                        onClick={() => this.editItem(i)}>
+                        Редактировать задачу
+                    </button>
+                </ul>
+
+                    
+                    
+                </React.Fragment>
             );
         });
-        return <ul>{listItems}</ul>;
+        if (filter === "SHOW_ALL") {
+            return <ul>{listItems}</ul>;
+        } else if (filter === "SHOW_ACTIVE") {
+            return todosItems;
+        } else if (filter === "SHOW_COMPLETED") {
+            return todosItems;
+        }
     }
     
 }
@@ -97,8 +141,15 @@ export function mapDispatchToProps(dispatch) {
 
         dispatch({type: 'UPDATE_ITEM', payload: { id, name } });
 
-    }
+      }
     }
   }
 
-  export default connect(null, mapDispatchToProps)(Items);
+  export function mapStateToProps(state) {
+    return {
+        "todos": getVisibleTodos(state.todo.items, state.visiblefilter),
+        "filter": state.visiblefilter
+    }
+  }
+
+  export default connect(mapStateToProps, mapDispatchToProps)(Items);

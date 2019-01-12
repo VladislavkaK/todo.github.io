@@ -30,3 +30,20 @@
     transform: rotate(360deg);
   }
 } */
+.FilterContainer {
+  padding-bottom: 15px;
+}
+
+.noneMarker{
+  list-style-type: none; /* Убираем маркеры */
+}
+
+.menu {
+  display:flex;
+  max-width: 100%;
+  height: auto
+}
+.frame{
+  display:inline-block;
+  width: 50%
+}
